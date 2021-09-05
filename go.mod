@@ -1,4 +1,4 @@
-module github.com/meandredev/safego
+module github.com/meandrewdev/safego
 
 go 1.17
 
