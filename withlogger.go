@@ -1,32 +1,22 @@
 package safego
 
 import (
-	"runtime/debug"
+	"fmt"
 
 	"github.com/meandrewdev/logger"
+	"github.com/ztrue/tracerr"
 )
 
 func WithDefaultLogger(f func(args ...interface{}), args ...interface{}) {
-	go func() {
-		defer func() {
-			if panicMessage := recover(); panicMessage != nil {
-				stack := debug.Stack()
-
-				logger.MessageF("PANIC: %v\nSTACK: %s", logger.LG_Error, panicMessage, stack)
-			}
-		}()
-
-		f(args...)
-	}()
+	WithLogger(logger.GetInstance(), f, args...)
 }
 
-func WithLogger(l *logger.Logger, f func(args ...interface{}), args ...interface{}) {
+func WithLogger(l logger.Logger, f func(args ...interface{}), args ...interface{}) {
 	go func() {
 		defer func() {
 			if panicMessage := recover(); panicMessage != nil {
-				stack := debug.Stack()
-
-				l.MessageF("PANIC: %v\nSTACK: %s", logger.LG_Error, panicMessage, stack)
+				err := tracerr.New(fmt.Sprintf("PANIC: %v", panicMessage))
+				logger.Error(err)
 			}
 		}()
 
